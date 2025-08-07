@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nonbuttarlo_app/screens/register_page.dart';
 import 'package:nonbuttarlo_app/services/auth_service.dart';
+import 'package:nonbuttarlo_app/main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -65,8 +66,9 @@ class _LoginPageState extends State<LoginPage>
           ),
         );
 
-        // TODO: Naviga alla home page dopo il login
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+        // Naviga alla home page dopo il login
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const MainScreen()));
       } catch (e) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(

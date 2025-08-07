@@ -2,7 +2,38 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = 'http://192.168.1.105:8001';
+
+  // Variabili temporanee in memoria (senza persistenza per ora)
+  static String? _currentToken;
+  static Map<String, dynamic>? _currentUser;
+
+  // Salva token e dati utente in memoria
+  static void _saveAuthData(String token, Map<String, dynamic> userData) {
+    _currentToken = token;
+    _currentUser = userData;
+  }
+
+  // Recupera token salvato
+  static Future<String?> getToken() async {
+    return _currentToken;
+  }
+
+  // Recupera dati utente salvati
+  static Future<Map<String, dynamic>?> getUserData() async {
+    return _currentUser;
+  }
+
+  // Verifica se l'utente è loggato
+  static Future<bool> isLoggedIn() async {
+    return _currentToken != null && _currentToken!.isNotEmpty;
+  }
+
+  // Logout - rimuove token e dati utente
+  static Future<void> logout() async {
+    _currentToken = null;
+    _currentUser = null;
+  }
 
   static Future<Map<String, dynamic>> register({
     required String email,
@@ -12,7 +43,7 @@ class AuthService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/ricette/auth/register/'),
+        Uri.parse('$baseUrl/api/auth/register/'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -25,7 +56,12 @@ class AuthService {
       );
 
       if (response.statusCode == 201) {
-        return json.decode(response.body);
+        final result = json.decode(response.body);
+        // Salva token e dati utente
+        if (result['token'] != null && result['user'] != null) {
+          _saveAuthData(result['token'], result['user']);
+        }
+        return result;
       } else {
         final errorData = json.decode(response.body);
         throw Exception(
@@ -42,7 +78,7 @@ class AuthService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/ricette/auth/login/'),
+        Uri.parse('$baseUrl/api/auth/login/'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -53,7 +89,12 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final result = json.decode(response.body);
+        // Salva token e dati utente
+        if (result['token'] != null && result['user'] != null) {
+          _saveAuthData(result['token'], result['user']);
+        }
+        return result;
       } else {
         final errorData = json.decode(response.body);
         throw Exception(errorData['error'] ?? 'Credenziali non valide');

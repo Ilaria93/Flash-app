@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nonbuttarlo_app/services/auth_service.dart';
+import 'package:nonbuttarlo_app/main.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -47,7 +48,9 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         );
 
-        Navigator.pop(context); // Torna alla pagina di login
+        // Naviga alla home page dopo la registrazione
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const MainScreen()));
       } catch (e) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(

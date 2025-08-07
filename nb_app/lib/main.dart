@@ -5,6 +5,7 @@ import 'package:nonbuttarlo_app/screens/search_screen.dart';
 import 'package:nonbuttarlo_app/screens/camera_screen.dart';
 import 'package:nonbuttarlo_app/screens/expiry_screen.dart';
 import 'package:nonbuttarlo_app/screens/profile_screen.dart';
+import 'package:nonbuttarlo_app/services/auth_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,8 +27,54 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Poppins',
       ),
-      home: const LoginPage(),
+      home: const AuthWrapper(),
     );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    try {
+      final isLoggedIn = await AuthService.isLoggedIn();
+      setState(() {
+        _isLoggedIn = isLoggedIn;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoggedIn = false;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    return _isLoggedIn ? const MainScreen() : const LoginPage();
   }
 }
 
